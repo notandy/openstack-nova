@@ -1778,6 +1778,12 @@ class LibvirtDriver(driver.ComputeDriver):
         xml = guest.get_xml_desc()
         tree = etree.fromstring(xml)
 
+        if CONF.libvirt.virt_type == "ch":
+            # needs a running PTS server
+            for source in "./devices/serial[@type='pty']/source":
+                yield (CONF.my_ip, int(source.get("path").split("/")[3]) + 10000)
+            return
+
         # The 'serial' device is the base for x86 platforms. Other platforms
         # (e.g. kvm on system z = S390X) can only use 'console' devices.
         xpath_mode = "[@mode='%s']" % mode if mode else ""
